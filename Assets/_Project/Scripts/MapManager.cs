@@ -8,6 +8,8 @@ public class MapManager : MonoBehaviour
 
     [Header("Database Configuration")]
     [SerializeField] private List<ProvinceData> allProvinces = new List<ProvinceData>();
+    [Header("UI Integration")]
+    [SerializeField] private ProvinceUIPanel provinceUIPanel; // Reference to our UI layer script
 
     // High-speed runtime lookup map linking Color keys to Province Data
     private Dictionary<Color32, ProvinceData> provinceColorRegistry = new Dictionary<Color32, ProvinceData>();
@@ -49,13 +51,26 @@ public class MapManager : MonoBehaviour
     {
         Color32 targetKey = clickedColor;
 
+        // Query the runtime O(1) registry map
         if (provinceColorRegistry.TryGetValue(targetKey, out ProvinceData foundProvince))
         {
-            Debug.Log($"<color=yellow><b>[Map Manager]</b></color> Selected Territory: <b>{foundProvince.provinceName}</b> (ID: {foundProvince.provinceID})");
+            Debug.Log($"<color=yellow><b>[Map Manager]</b></color> Selected Territory: {foundProvince.provinceName}");
+            
+            // ROUTE DATA TO UI: Pass the found asset straight to the UI display panel
+            if (provinceUIPanel != null)
+            {
+                provinceUIPanel.DisplayProvince(foundProvince);
+            }
         }
         else
         {
             Debug.LogWarning($"[Map Manager] No territory found matching color signature: {targetKey}");
+            
+            // CLEANUP EVENT: Hide the panel if the user clicks on empty space or boundaries
+            if (provinceUIPanel != null)
+            {
+                provinceUIPanel.HidePanel();
+            }
         }
     }
 }
