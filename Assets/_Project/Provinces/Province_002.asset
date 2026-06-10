@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ProvinceData
   provinceID: 2
   provinceName: Smila
-  colorIdentity: {r: 0.96020585, g: 0.47615016, b: 0.47615016, a: 1}
+  colorIdentity: {r: 0, g: 1, b: 0, a: 1}
