@@ -17,8 +17,8 @@ public class TimeManager : MonoBehaviour
 
     [Header("Current Calendar State")]
     [SerializeField] private int currentDay = 1;
-    [SerializeField] private int currentMonth = 1; // 1 = January, 12 = December
-    [SerializeField] private int currentYear = 1444;
+    [SerializeField] private int currentMonth = 1;
+    [SerializeField] private int currentYear = 2000;
 
     private ClockSpeed currentSpeed = ClockSpeed.Paused;
     private ClockSpeed prePauseSpeed = ClockSpeed.Normal; // Remembers last speed when hitting spacebar
