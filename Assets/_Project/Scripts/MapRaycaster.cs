@@ -1,11 +1,15 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using TMPro;
 
 public class MapRaycaster : MonoBehaviour
 {
-    [Header("Raycast Settings")]
+    [Header("Raycast Configurations")]
     [SerializeField] private Camera targetCamera;
-    [SerializeField] private LayerMask mapLayer;
+    [SerializeField] private LayerMask mapLayerMask;
+
+    [Header("UI Hover Integration")]
+    [SerializeField] private TextMeshProUGUI hoverTooltipText;
 
     private void Awake()
     {
@@ -18,27 +22,32 @@ public class MapRaycaster : MonoBehaviour
 
     private void Update()
     {
-        // 2. Read the primary click using the new Input System API
-        if (Pointer.current != null && Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
+        // 1. Process Click Inputs
+        if (Pointer.current != null && Mouse.current.leftButton.wasPressedThisFrame)
         {
-            PerformMapLookup();
+            PerformMapLookup(true);
+        }
+        // 2. Continuous Hover Input tracking
+        else
+        {
+            PerformMapLookup(false);
         }
     }
 
-    private void PerformMapLookup()
+    private void PerformMapLookup(bool isExplicitClick)
     {
-        // 3. Read the cursor position using the new modern vector tracking
-        Vector2 mousePosition = Mouse.current.position.ReadValue();
-        
+        if (Pointer.current == null) return;
+
+        Vector2 mousePosition = Pointer.current.position.ReadValue();
         Ray ray = targetCamera.ScreenPointToRay(mousePosition);
-        RaycastHit hit;
 
-        if (Physics.Raycast(ray, out hit, Mathf.Infinity, mapLayer))
+        // Perform optimized physics calculation using our custom layer mask
+        if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, mapLayerMask))
         {
-            Renderer meshRenderer = hit.collider.GetComponent<Renderer>();
-            if (meshRenderer == null || meshRenderer.sharedMaterial == null) return;
+            Renderer mapRenderer = hit.collider.GetComponent<Renderer>();
+            if (mapRenderer == null) return;
 
-            Texture2D lookupTexture = meshRenderer.sharedMaterial.mainTexture as Texture2D;
+            Texture2D lookupTexture = mapRenderer.sharedMaterial.mainTexture as Texture2D;
             if (lookupTexture == null) return;
 
             Vector2 uv = hit.textureCoord;
@@ -48,13 +57,64 @@ public class MapRaycaster : MonoBehaviour
 
             Color clickedColor = lookupTexture.GetPixel(pixelX, pixelY);
 
-            // Send the sampled color straight to the registry manager!
-            if (MapManager.Instance != null)
+            if (isExplicitClick)
             {
-                MapManager.Instance.GetProvinceFromColor(clickedColor);
+                // ROUTE CLICK EVENT: Send full data profile packet to our primary info layout
+                if (MapManager.Instance != null)
+                {
+                    MapManager.Instance.GetProvinceFromColor(clickedColor);
+                }
             }
-            
-            Debug.Log($"<color=green><b>[Map Raycaster]</b></color> Sampled Color: {clickedColor} at UV ({uv.x:F3}, {uv.y:F3})");
+            else
+            {
+                // ROUTE HOVER EVENT: Ask the manager if a valid province sits under this color key
+                ProcessHoverContext(clickedColor);
+            }
         }
+        else if (!isExplicitClick)
+        {
+            // Clear hover text if mouse flies completely off the map mesh surface geometry
+            ClearHoverDisplay();
+        }
+    }
+
+    private void ProcessHoverContext(Color hoverColor)
+    {
+        if (MapManager.Instance == null || hoverTooltipText == null) return;
+
+        // Use our public MapManager dictionary registry framework safely
+        Color32 targetKey = hoverColor;
+        
+        // We bypass the console log spam by fetching information quietly or writing an helper inside manager
+        // For simple Phase 1 hover, we can ask MapManager to process or pass string text context
+        ProvinceData hoveredData = MapManager.Instance.GetComponent<MapManager>() != null ? 
+            ExtractProvinceFromRegistryDirectly(targetKey) : null;
+
+        if (hoveredData != null)
+        {
+            hoverTooltipText.text = $"<color=yellow>{hoveredData.provinceName}</color>";
+        }
+        else
+        {
+            ClearHoverDisplay();
+        }
+    }
+
+    private void ClearHoverDisplay()
+    {
+        if (hoverTooltipText != null)
+        {
+            hoverTooltipText.text = "";
+        }
+    }
+
+    // Quick helper to read data silently without executing click logs
+    private ProvinceData ExtractProvinceFromRegistryDirectly(Color32 colorKey)
+    {
+        if (MapManager.Instance != null)
+        {
+            return MapManager.Instance.GetProvinceDataRaw(colorKey);
+        }
+        return null;
     }
 }
