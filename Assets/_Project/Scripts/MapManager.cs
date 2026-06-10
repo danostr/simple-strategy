@@ -8,6 +8,8 @@ public class MapManager : MonoBehaviour
 
     [Header("Database Configuration")]
     [SerializeField] private List<ProvinceData> allProvinces = new List<ProvinceData>();
+    [Header("UI Integration")]
+    [SerializeField] private ProvinceUIPanel provinceUIPanel; // Reference to our UI layer script
 
     [Header("UI Integration")]
     [SerializeField] private ProvinceUIPanel provinceUIPanel; // ADD THIS REFERENCE LINE
@@ -52,6 +54,7 @@ public class MapManager : MonoBehaviour
     {
         Color32 targetKey = clickedColor;
 
+        // Query the runtime O(1) registry map
         if (provinceColorRegistry.TryGetValue(targetKey, out ProvinceData foundProvince))
         {
             Debug.Log($"<color=yellow><b>[Map Manager]</b></color> Selected Territory: <b>{foundProvince.provinceName}</b> (ID: {foundProvince.provinceID})");
