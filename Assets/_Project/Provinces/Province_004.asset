@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2ea49cae02d981540863c5032b5b347b, type: 3}
-  m_Name: Province_002
+  m_Name: Province_004
   m_EditorClassIdentifier: Assembly-CSharp::ProvinceData
-  provinceID: 2
-  provinceName: Marienburg
-  colorIdentity: {r: 0, g: 1, b: 0, a: 1}
-  population: 62000
-  economy: 10
+  provinceID: 4
+  provinceName: Nuln
+  colorIdentity: {r: 1, g: 0, b: 1, a: 1}
+  population: 35000
+  economy: 7

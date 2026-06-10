@@ -23,4 +23,4 @@ alternative to complex historical strategy titles.
 * `/Assets/_Project/` -> All custom code, prefabs, and scenes.
 * `/Assets/ThirdParty/` -> External plugins and assets.
 
-================================================================================
+---
