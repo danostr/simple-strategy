@@ -11,9 +11,6 @@ public class MapManager : MonoBehaviour
     [Header("UI Integration")]
     [SerializeField] private ProvinceUIPanel provinceUIPanel; // Reference to our UI layer script
 
-    [Header("UI Integration")]
-    [SerializeField] private ProvinceUIPanel provinceUIPanel; // ADD THIS REFERENCE LINE
-
     // High-speed runtime lookup map linking Color keys to Province Data
     private Dictionary<Color32, ProvinceData> provinceColorRegistry = new Dictionary<Color32, ProvinceData>();
 
