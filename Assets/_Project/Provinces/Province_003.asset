@@ -13,5 +13,7 @@ MonoBehaviour:
   m_Name: Province_003
   m_EditorClassIdentifier: Assembly-CSharp::ProvinceData
   provinceID: 3
-  provinceName: Hudiaky
+  provinceName: Middenheim
   colorIdentity: {r: 0, g: 0, b: 1, a: 1}
+  population: 28000
+  economy: 5

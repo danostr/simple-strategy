@@ -13,5 +13,7 @@ MonoBehaviour:
   m_Name: Province_001
   m_EditorClassIdentifier: Assembly-CSharp::ProvinceData
   provinceID: 1
-  provinceName: Cherkasy
+  provinceName: Altdorf
   colorIdentity: {r: 1, g: 0, b: 0, a: 1}
+  population: 45000
+  economy: 8
