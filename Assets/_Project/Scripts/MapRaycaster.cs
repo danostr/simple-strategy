@@ -48,6 +48,12 @@ public class MapRaycaster : MonoBehaviour
 
             Color clickedColor = lookupTexture.GetPixel(pixelX, pixelY);
 
+            // Send the sampled color straight to the registry manager!
+            if (MapManager.Instance != null)
+            {
+                MapManager.Instance.GetProvinceFromColor(clickedColor);
+            }
+            
             Debug.Log($"<color=green><b>[Map Raycaster]</b></color> Sampled Color: {clickedColor} at UV ({uv.x:F3}, {uv.y:F3})");
         }
     }

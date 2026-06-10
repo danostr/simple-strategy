@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ProvinceData
   provinceID: 3
   provinceName: Hudiaky
-  colorIdentity: {r: 0.5732419, g: 0.52496374, b: 0.52496374, a: 1}
+  colorIdentity: {r: 0, g: 0, b: 1, a: 1}
