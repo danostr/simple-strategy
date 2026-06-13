@@ -3,16 +3,16 @@ using UnityEngine;
 
 public class MapManager : MonoBehaviour
 {
-    // Singleton Instance so our Raycaster can find it instantly
     public static MapManager Instance { get; private set; }
 
     [Header("Database Configuration")]
     [SerializeField] private List<ProvinceData> allProvinces = new List<ProvinceData>();
-    [Header("UI Integration")]
-    [SerializeField] private ProvinceUIPanel provinceUIPanel; // Reference to our UI layer script
 
-    // High-speed runtime lookup map linking Color keys to Province Data
-    private Dictionary<Color32, ProvinceData> provinceColorRegistry = new Dictionary<Color32, ProvinceData>();
+    [Header("UI Integration")]
+    [SerializeField] private ProvinceUIPanel provinceUIPanel;
+
+    // Rerouted dictionary mapping Color32 keys straight to live decoupled memory wrappers
+    private Dictionary<Color32, RuntimeProvinceState> provinceColorRegistry = new Dictionary<Color32, RuntimeProvinceState>();
 
     private void Awake()
     {
@@ -28,21 +28,23 @@ public class MapManager : MonoBehaviour
 
     private void InitializeColorRegistry()
     {
-        foreach (ProvinceData province in allProvinces)
+        foreach (ProvinceData assetTemplate in allProvinces)
         {
-            if (province == null) continue;
+            if (assetTemplate == null) continue;
 
-            // Using Color32 prevents floating-point precision mismatch issues during lookups
-            Color32 keyColor = province.colorIdentity;
+            Color32 keyColor = assetTemplate.colorIdentity;
 
             if (!provinceColorRegistry.ContainsKey(keyColor))
             {
-                provinceColorRegistry.Add(keyColor, province);
-                Debug.Log($"<color=cyan><b>[Map Manager]</b></color> Registered '[ID: {province.provinceID}] {province.provinceName}' under color key: {keyColor}");
+                // DECOUPLE LOGIC: Wrap the static file template into a fresh runtime instance state
+                RuntimeProvinceState liveStateInstance = new RuntimeProvinceState(assetTemplate);
+                
+                provinceColorRegistry.Add(keyColor, liveStateInstance);
+                Debug.Log($"<color=cyan><b>[Map Manager]</b></color> Instantiated decoupled runtime state wrapper for '[ID: {assetTemplate.provinceID}] {assetTemplate.provinceName}'");
             }
             else
             {
-                Debug.LogWarning($"[Map Manager] Duplicate color identity detected for {province.provinceName}!");
+                Debug.LogWarning($"[Map Manager] Duplicate color identity detected for {assetTemplate.provinceName}!");
             }
         }
     }
@@ -51,22 +53,19 @@ public class MapManager : MonoBehaviour
     {
         Color32 targetKey = clickedColor;
 
-        // Query the runtime O(1) registry map
-        if (provinceColorRegistry.TryGetValue(targetKey, out ProvinceData foundProvince))
+        // Query the runtime live database registry map
+        if (provinceColorRegistry.TryGetValue(targetKey, out RuntimeProvinceState foundState))
         {
-            Debug.Log($"<color=yellow><b>[Map Manager]</b></color> Selected Territory: <b>{foundProvince.provinceName}</b> (ID: {foundProvince.provinceID})");
+            Debug.Log($"<color=yellow><b>[Map Manager]</b></color> Selected Runtime Territory: <b>{foundState.SourceAsset.provinceName}</b>");
             
-            // ROUTE TO UI: Pass the data card over to our presentation display layout!
             if (provinceUIPanel != null)
             {
-                provinceUIPanel.DisplayProvince(foundProvince);
+                provinceUIPanel.DisplayProvince(foundState);
             }
         }
         else
         {
             Debug.LogWarning($"[Map Manager] No territory found matching color signature: {targetKey}");
-            
-            // CLEANUP TRIGGER: Force-hide the panel if clicking an invalid color or dead zone
             if (provinceUIPanel != null)
             {
                 provinceUIPanel.HidePanel();
@@ -74,11 +73,14 @@ public class MapManager : MonoBehaviour
         }
     }
 
-    public ProvinceData GetProvinceDataRaw(Color32 colorKey)
+    /// <summary>
+    /// Public tool allowing hover tracking systems to safely poll regional records silently.
+    /// </summary>
+    public RuntimeProvinceState GetProvinceDataRaw(Color32 colorKey)
     {
-        if (provinceColorRegistry.TryGetValue(colorKey, out ProvinceData data))
+        if (provinceColorRegistry.TryGetValue(colorKey, out RuntimeProvinceState dataState))
         {
-            return data;
+            return dataState;
         }
         return null;
     }

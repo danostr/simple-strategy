@@ -18,7 +18,7 @@ public class ProvinceUIPanel : MonoBehaviour
     /// <summary>
     /// Public entry point to map incoming data variables and toggle visibility on.
     /// </summary>
-    public void DisplayProvince(ProvinceData data)
+    public void DisplayProvince(RuntimeProvinceState dataState)
     {
         if (data == null)
         {
