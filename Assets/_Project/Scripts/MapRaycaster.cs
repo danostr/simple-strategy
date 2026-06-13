@@ -82,22 +82,29 @@ public class MapRaycaster : MonoBehaviour
     {
         if (MapManager.Instance == null || hoverTooltipText == null) return;
 
-        // Use our public MapManager dictionary registry framework safely
         Color32 targetKey = hoverColor;
         
-        // We bypass the console log spam by fetching information quietly or writing an helper inside manager
-        // For simple Phase 1 hover, we can ask MapManager to process or pass string text context
-        ProvinceData hoveredData = MapManager.Instance.GetComponent<MapManager>() != null ? 
-            ExtractProvinceFromRegistryDirectly(targetKey) : null;
+        // Update data type to point to our newly decoupled runtime state signature wrapper card
+        RuntimeProvinceState hoveredState = ExtractProvinceFromRegistryDirectly(targetKey);
 
-        if (hoveredData != null)
+        if (hoveredState != null)
         {
-            hoverTooltipText.text = $"<color=yellow>{hoveredData.provinceName}</color>";
+            hoverTooltipText.text = $"<color=yellow>{hoveredState.SourceAsset.provinceName}</color>";
         }
         else
         {
             ClearHoverDisplay();
         }
+    }
+
+    // Adjust return identifier types cleanly
+    private RuntimeProvinceState ExtractProvinceFromRegistryDirectly(Color32 colorKey)
+    {
+        if (MapManager.Instance != null)
+        {
+            return MapManager.Instance.GetProvinceDataRaw(colorKey);
+        }
+        return null;
     }
 
     private void ClearHoverDisplay()
