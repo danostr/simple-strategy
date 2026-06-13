@@ -97,16 +97,6 @@ public class MapRaycaster : MonoBehaviour
         }
     }
 
-    // Adjust return identifier types cleanly
-    private RuntimeProvinceState ExtractProvinceFromRegistryDirectly(Color32 colorKey)
-    {
-        if (MapManager.Instance != null)
-        {
-            return MapManager.Instance.GetProvinceDataRaw(colorKey);
-        }
-        return null;
-    }
-
     private void ClearHoverDisplay()
     {
         if (hoverTooltipText != null)
@@ -115,8 +105,7 @@ public class MapRaycaster : MonoBehaviour
         }
     }
 
-    // Quick helper to read data silently without executing click logs
-    private ProvinceData ExtractProvinceFromRegistryDirectly(Color32 colorKey)
+    private RuntimeProvinceState ExtractProvinceFromRegistryDirectly(Color32 colorKey)
     {
         if (MapManager.Instance != null)
         {
